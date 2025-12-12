@@ -35,7 +35,7 @@
   - **Property 4: Successful login creates session**
   - **Validates: Requirements 1.4**
 
-- [ ] 4. UI 컴포넌트 라이브러리 설정
+- [x] 4. UI 컴포넌트 라이브러리 설정
   - shadcn/ui 컴포넌트 설치 및 설정
   - 공통 UI 컴포넌트 생성 (Button, Input, Card, Avatar 등)
   - 레이아웃 컴포넌트 구현 (Header, Navigation)
