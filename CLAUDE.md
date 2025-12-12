@@ -8,6 +8,26 @@ This is a simple Instagram clone built with Next.js 16+ (App Router), TypeScript
 
 **Important**: This project follows a property-based testing approach. Each major feature has corresponding test files (marked with `*` in tasks.md) that validate requirements before implementation.
 
+## Context Recovery (After /clear or Context Loss)
+
+**IMPORTANT**: When starting a new session or after losing context, ALWAYS read the following file first:
+
+```
+.kiro/specs/simple-instagram/tasks.md
+```
+
+This file contains:
+- `[x]` Completed tasks - What has already been done
+- `[ ]` Pending tasks - What needs to be done next
+- `[ ]*` Test tasks - Property-based tests that must be written before implementation
+- Requirements references for each task
+
+**Steps to recover context:**
+1. Read `.kiro/specs/simple-instagram/tasks.md` to understand progress
+2. Find the first unchecked `[ ]` task - this is the next task to work on
+3. Read `.kiro/specs/simple-instagram/requirements.md` for detailed acceptance criteria
+4. Continue implementation from where it was left off
+
 ## Development Commands
 
 ### Running the Application
