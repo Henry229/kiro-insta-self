@@ -12,7 +12,7 @@
   - Prisma Client 생성 및 데이터베이스 마이그레이션
   - _Requirements: 1.1, 2.2, 4.1, 5.1, 6.1_
 
-- [x]* 2.1 데이터베이스 모델 속성 테스트 작성
+- [x] 2.1 데이터베이스 모델 속성 테스트 작성
   - **Property 1: Valid user registration creates account**
   - **Validates: Requirements 1.1**
 
@@ -23,15 +23,15 @@
   - 인증 미들웨어 및 세션 관리
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [x]* 3.1 인증 속성 테스트 작성
+- [x] 3.1 인증 속성 테스트 작성
   - **Property 2: Valid login succeeds**
   - **Validates: Requirements 1.2**
 
-- [x]* 3.2 인증 실패 속성 테스트 작성
+- [x] 3.2 인증 실패 속성 테스트 작성
   - **Property 3: Invalid login fails**
   - **Validates: Requirements 1.3**
 
-- [x]* 3.3 세션 생성 속성 테스트 작성
+- [x] 3.3 세션 생성 속성 테스트 작성
   - **Property 4: Successful login creates session**
   - **Validates: Requirements 1.4**
 
