@@ -55,7 +55,7 @@
   - **Property 7: Invalid file upload rejected**
   - **Validates: Requirements 2.3**
 
-- [ ] 6. 게시물 관리 시스템 구현
+- [x] 6. 게시물 관리 시스템 구현
   - 게시물 생성 API Routes 구현
   - 게시물 조회 및 목록 API Routes
   - 게시물 수정/삭제 API Routes

@@ -5,7 +5,10 @@ import * as bcrypt from 'bcrypt'
 const prisma = new PrismaClient()
 
 describe('Task 2.1 - Database Model: Valid user registration creates account', () => {
+  let testCounter = 0
+
   beforeEach(async () => {
+    testCounter++
     // Clean up database before each test
     await prisma.comment.deleteMany()
     await prisma.like.deleteMany()
@@ -70,9 +73,10 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
 
   it('should enforce unique email constraint', async () => {
     // Arrange
+    const uniqueEmail = `duplicate_${testCounter}@example.com`
     const userData = {
-      email: 'duplicate@example.com',
-      username: 'user1',
+      email: uniqueEmail,
+      username: `user1_${testCounter}`,
       password: await bcrypt.hash('password123', 10),
     }
 
@@ -82,8 +86,8 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
     await expect(
       prisma.user.create({
         data: {
-          email: 'duplicate@example.com',
-          username: 'user2',
+          email: uniqueEmail, // Same email, different username
+          username: `user2_${testCounter}`,
           password: await bcrypt.hash('password456', 10),
         },
       })
@@ -92,9 +96,10 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
 
   it('should enforce unique username constraint', async () => {
     // Arrange
+    const uniqueUsername = `duplicateuser_${testCounter}`
     const userData = {
-      email: 'user1@example.com',
-      username: 'duplicateuser',
+      email: `user1_${testCounter}@example.com`,
+      username: uniqueUsername,
       password: await bcrypt.hash('password123', 10),
     }
 
@@ -104,8 +109,8 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
     await expect(
       prisma.user.create({
         data: {
-          email: 'user2@example.com',
-          username: 'duplicateuser',
+          email: `user2_${testCounter}@example.com`,
+          username: uniqueUsername, // Same username, different email
           password: await bcrypt.hash('password456', 10),
         },
       })
