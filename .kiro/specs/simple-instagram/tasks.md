@@ -61,23 +61,23 @@
   - 게시물 수정/삭제 API Routes
   - _Requirements: 2.2, 2.4, 3.1, 3.2, 3.4_
 
-- [ ]* 6.1 게시물 생성 속성 테스트 작성
+- [x]* 6.1 게시물 생성 속성 테스트 작성
   - **Property 6: Post creation adds to feed**
   - **Validates: Requirements 2.2**
 
-- [ ]* 6.2 게시물 리디렉션 속성 테스트 작성
+- [x]* 6.2 게시물 리디렉션 속성 테스트 작성
   - **Property 8: Successful post creation redirects**
   - **Validates: Requirements 2.4**
 
-- [ ]* 6.3 피드 정렬 속성 테스트 작성
+- [x]* 6.3 피드 정렬 속성 테스트 작성
   - **Property 9: Feed displays posts in chronological order**
   - **Validates: Requirements 3.1**
 
-- [ ]* 6.4 게시물 정보 표시 속성 테스트 작성
+- [x]* 6.4 게시물 정보 표시 속성 테스트 작성
   - **Property 10: Post display includes required information**
   - **Validates: Requirements 3.2**
 
-- [ ]* 6.5 새 게시물 피드 상단 표시 속성 테스트 작성
+- [x]* 6.5 새 게시물 피드 상단 표시 속성 테스트 작성
   - **Property 11: New posts appear at top of feed**
   - **Validates: Requirements 3.4**
 
