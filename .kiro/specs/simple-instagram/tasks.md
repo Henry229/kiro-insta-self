@@ -16,22 +16,22 @@
   - **Property 1: Valid user registration creates account**
   - **Validates: Requirements 1.1**
 
-- [ ] 3. 인증 시스템 구현
+- [x] 3. 인증 시스템 구현
   - NextAuth.js 설정 및 구성
   - 사용자 등록 API Route 구현
   - 로그인/로그아웃 기능 구현
   - 인증 미들웨어 및 세션 관리
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ]* 3.1 인증 속성 테스트 작성
+- [x]* 3.1 인증 속성 테스트 작성
   - **Property 2: Valid login succeeds**
   - **Validates: Requirements 1.2**
 
-- [ ]* 3.2 인증 실패 속성 테스트 작성
+- [x]* 3.2 인증 실패 속성 테스트 작성
   - **Property 3: Invalid login fails**
   - **Validates: Requirements 1.3**
 
-- [ ]* 3.3 세션 생성 속성 테스트 작성
+- [x]* 3.3 세션 생성 속성 테스트 작성
   - **Property 4: Successful login creates session**
   - **Validates: Requirements 1.4**
 
