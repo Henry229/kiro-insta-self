@@ -47,11 +47,11 @@
   - 이미지 미리보기 컴포넌트
   - _Requirements: 2.1, 2.3_
 
-- [ ]* 5.1 파일 업로드 속성 테스트 작성
+- [x]* 5.1 파일 업로드 속성 테스트 작성
   - **Property 5: Valid image upload shows preview**
   - **Validates: Requirements 2.1**
 
-- [ ]* 5.2 잘못된 파일 업로드 속성 테스트 작성
+- [x]* 5.2 잘못된 파일 업로드 속성 테스트 작성
   - **Property 7: Invalid file upload rejected**
   - **Validates: Requirements 2.3**
 
