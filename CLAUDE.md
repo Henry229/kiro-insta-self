@@ -42,10 +42,10 @@ npm run type-check       # Run TypeScript type checking
 
 ### Git Hooks
 This project uses Husky and lint-staged for automated quality checks:
-- **Pre-commit hook**: Automatically runs `eslint --fix` on staged files
+- **Pre-commit hook**: Automatically runs `eslint --fix` on staged files, then `tsc --noEmit` for type checking
 - **Auto-fix**: ESLint automatically fixes fixable issues before commit
-- **Manual type-check**: Run `npm run type-check` before committing for TypeScript validation
-- Configuration in `package.json` under `lint-staged`
+- **Type safety**: TypeScript type errors will block commits
+- Configuration in `package.json` under `lint-staged` and `.husky/pre-commit`
 
 ## Architecture
 
@@ -186,11 +186,11 @@ After completing any coding work, **MUST** perform the following steps in order:
 This project uses **Husky + lint-staged** for pre-commit hooks:
 
 - **Automatic linting**: When you commit, `eslint --fix` automatically fixes code style issues
-- **Staged files only**: Only staged files are checked for faster commits
-- **Manual type-check**: Run `npm run type-check` manually before committing
-- **Configuration**: See `lint-staged` section in `package.json`
+- **Automatic type checking**: `tsc --noEmit` runs after linting to catch type errors
+- **Commit blocking**: If either lint or type-check fails, the commit is blocked
+- **Configuration**: See `lint-staged` in `package.json` and `.husky/pre-commit`
 
-This ensures linting standards are enforced automatically. Type checking should be run manually as part of the quality assurance checklist.
+This ensures all committed code meets both linting and type safety standards automatically.
 
 ## Key Implementation Notes
 
