@@ -6,13 +6,13 @@
   - 기본 폴더 구조 생성 (app, components, lib, types)
   - _Requirements: 전체 시스템 기반_
 
-- [ ] 2. 데이터베이스 및 ORM 설정
+- [x] 2. 데이터베이스 및 ORM 설정
   - Prisma 설치 및 초기 설정
   - SQLite 데이터베이스 스키마 정의
   - Prisma Client 생성 및 데이터베이스 마이그레이션
   - _Requirements: 1.1, 2.2, 4.1, 5.1, 6.1_
 
-- [ ]* 2.1 데이터베이스 모델 속성 테스트 작성
+- [x]* 2.1 데이터베이스 모델 속성 테스트 작성
   - **Property 1: Valid user registration creates account**
   - **Validates: Requirements 1.1**
 
