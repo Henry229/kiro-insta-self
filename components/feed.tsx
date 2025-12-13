@@ -26,9 +26,10 @@ interface FeedProps {
   initialPosts: Post[];
   initialCursor: string | null;
   isAuthenticated: boolean;
+  currentUserId?: string;
 }
 
-export function Feed({ initialPosts, initialCursor, isAuthenticated }: FeedProps) {
+export function Feed({ initialPosts, initialCursor, isAuthenticated, currentUserId }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [loading, setLoading] = useState(false);
@@ -71,7 +72,7 @@ export function Feed({ initialPosts, initialCursor, isAuthenticated }: FeedProps
     <div className="w-full">
       <div className="space-y-6">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} isAuthenticated={isAuthenticated} />
+          <PostCard key={post.id} post={post} isAuthenticated={isAuthenticated} currentUserId={currentUserId} />
         ))}
       </div>
 

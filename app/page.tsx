@@ -72,7 +72,12 @@ export default async function Home() {
         </p>
       </div>
 
-      <Feed initialPosts={postsWithLiked} initialCursor={nextCursor} isAuthenticated={true} />
+      <Feed
+        initialPosts={postsWithLiked}
+        initialCursor={nextCursor}
+        isAuthenticated={true}
+        currentUserId={currentUser.id}
+      />
     </main>
   );
 }

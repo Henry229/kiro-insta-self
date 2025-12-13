@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LikeButton } from '@/components/like-button';
+import { CommentSection } from '@/components/comment-section';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -27,9 +28,10 @@ interface Post {
 interface PostCardProps {
   post: Post;
   isAuthenticated: boolean;
+  currentUserId?: string;
 }
 
-export function PostCard({ post, isAuthenticated }: PostCardProps) {
+export function PostCard({ post, isAuthenticated, currentUserId }: PostCardProps) {
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), {
     addSuffix: true,
     locale: ko,
@@ -85,6 +87,15 @@ export function PostCard({ post, isAuthenticated }: PostCardProps) {
         )}
 
         <p className="text-xs text-muted-foreground">{timeAgo}</p>
+
+        {/* 댓글 섹션 */}
+        <CommentSection
+          postId={post.id}
+          postAuthorId={post.user.id}
+          initialCommentCount={post._count.comments}
+          isAuthenticated={isAuthenticated}
+          currentUserId={currentUserId}
+        />
       </CardFooter>
     </Card>
   );
