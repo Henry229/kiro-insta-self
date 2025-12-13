@@ -88,21 +88,21 @@
   - 빈 상태 처리
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 8. 좋아요 시스템 구현
+- [x] 8. 좋아요 시스템 구현
   - 좋아요 토글 API Route 구현
   - 좋아요 버튼 컴포넌트
   - 좋아요 수 표시 및 상태 관리
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ]* 8.1 좋아요 증가 속성 테스트 작성
+- [x] 8.1 좋아요 증가 속성 테스트 작성
   - **Property 12: Like increases count and activates button**
   - **Validates: Requirements 4.1**
 
-- [ ]* 8.2 좋아요 토글 속성 테스트 작성
+- [x] 8.2 좋아요 토글 속성 테스트 작성
   - **Property 13: Like toggle is idempotent**
   - **Validates: Requirements 4.2**
 
-- [ ]* 8.3 좋아요 정보 표시 속성 테스트 작성
+- [x] 8.3 좋아요 정보 표시 속성 테스트 작성
   - **Property 14: Post displays accurate like information**
   - **Validates: Requirements 4.3**
 
