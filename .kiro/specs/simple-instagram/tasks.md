@@ -47,11 +47,11 @@
   - 이미지 미리보기 컴포넌트
   - _Requirements: 2.1, 2.3_
 
-- [x]* 5.1 파일 업로드 속성 테스트 작성
+- [x] 5.1 파일 업로드 속성 테스트 작성
   - **Property 5: Valid image upload shows preview**
   - **Validates: Requirements 2.1**
 
-- [x]* 5.2 잘못된 파일 업로드 속성 테스트 작성
+- [x] 5.2 잘못된 파일 업로드 속성 테스트 작성
   - **Property 7: Invalid file upload rejected**
   - **Validates: Requirements 2.3**
 
@@ -61,27 +61,27 @@
   - 게시물 수정/삭제 API Routes
   - _Requirements: 2.2, 2.4, 3.1, 3.2, 3.4_
 
-- [x]* 6.1 게시물 생성 속성 테스트 작성
+- [x] 6.1 게시물 생성 속성 테스트 작성
   - **Property 6: Post creation adds to feed**
   - **Validates: Requirements 2.2**
 
-- [x]* 6.2 게시물 리디렉션 속성 테스트 작성
+- [x] 6.2 게시물 리디렉션 속성 테스트 작성
   - **Property 8: Successful post creation redirects**
   - **Validates: Requirements 2.4**
 
-- [x]* 6.3 피드 정렬 속성 테스트 작성
+- [x] 6.3 피드 정렬 속성 테스트 작성
   - **Property 9: Feed displays posts in chronological order**
   - **Validates: Requirements 3.1**
 
-- [x]* 6.4 게시물 정보 표시 속성 테스트 작성
+- [x] 6.4 게시물 정보 표시 속성 테스트 작성
   - **Property 10: Post display includes required information**
   - **Validates: Requirements 3.2**
 
-- [x]* 6.5 새 게시물 피드 상단 표시 속성 테스트 작성
+- [x] 6.5 새 게시물 피드 상단 표시 속성 테스트 작성
   - **Property 11: New posts appear at top of feed**
   - **Validates: Requirements 3.4**
 
-- [ ] 7. 피드 페이지 구현
+- [x] 7. 피드 페이지 구현
   - 메인 피드 페이지 컴포넌트
   - 게시물 카드 컴포넌트
   - 무한 스크롤 또는 페이지네이션
