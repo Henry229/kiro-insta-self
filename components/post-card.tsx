@@ -1,14 +1,17 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { LikeButton } from '@/components/like-button';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { MessageCircle } from 'lucide-react';
 
 interface Post {
   id: string;
   image: string;
   caption: string | null;
   createdAt: Date;
+  liked: boolean;
   user: {
     id: string;
     username: string;
@@ -23,9 +26,10 @@ interface Post {
 
 interface PostCardProps {
   post: Post;
+  isAuthenticated: boolean;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, isAuthenticated }: PostCardProps) {
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), {
     addSuffix: true,
     locale: ko,
@@ -57,15 +61,17 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-start gap-2 p-4">
+      <CardFooter className="flex flex-col items-start gap-3 p-4">
         <div className="flex items-center gap-4 w-full">
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium">좋아요</span>
-            <span className="text-sm text-muted-foreground">{post._count.likes}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium">댓글</span>
-            <span className="text-sm text-muted-foreground">{post._count.comments}</span>
+          <LikeButton
+            postId={post.id}
+            initialLiked={post.liked}
+            initialLikeCount={post._count.likes}
+            isAuthenticated={isAuthenticated}
+          />
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <MessageCircle className="h-5 w-5" />
+            <span className="text-sm font-medium">{post._count.comments}</span>
           </div>
         </div>
 

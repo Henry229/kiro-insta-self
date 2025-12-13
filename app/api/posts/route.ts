@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
 // GET /api/posts - 게시물 목록 조회 (최신순)
 export async function GET(request: NextRequest) {
   try {
+    const session = await auth();
     const { searchParams } = new URL(request.url);
     const rawLimit = searchParams.get('limit') || '10';
     const cursor = searchParams.get('cursor');
@@ -91,6 +92,15 @@ export async function GET(request: NextRequest) {
       limit = 10; // Default to 10 if invalid
     } else if (limit > 100) {
       limit = 100; // Cap at 100 to prevent excessive queries
+    }
+
+    // 현재 로그인한 사용자 조회
+    let currentUser = null;
+    if (session?.user?.email) {
+      currentUser = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true },
+      });
     }
 
     // 쿼리 조건 설정
@@ -118,6 +128,16 @@ export async function GET(request: NextRequest) {
             image: true,
           },
         },
+        likes: currentUser
+          ? {
+              where: {
+                userId: currentUser.id,
+              },
+              select: {
+                userId: true,
+              },
+            }
+          : false,
         _count: {
           select: {
             likes: true,
@@ -127,11 +147,18 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // 게시물에 liked 속성 추가
+    const postsWithLiked = posts.map((post) => ({
+      ...post,
+      liked: currentUser ? post.likes.length > 0 : false,
+      likes: undefined, // 클라이언트에 likes 배열을 보내지 않음
+    }));
+
     // 다음 페이지 커서
     const nextCursor = posts.length === limit ? posts[posts.length - 1].id : null;
 
     return NextResponse.json({
-      posts,
+      posts: postsWithLiked,
       nextCursor,
     });
   } catch (error) {

@@ -11,6 +11,16 @@ export default async function Home() {
     redirect('/auth/signin');
   }
 
+  // 현재 로그인한 사용자 조회
+  const currentUser = await prisma.user.findUnique({
+    where: { email: session.user!.email! },
+    select: { id: true },
+  });
+
+  if (!currentUser) {
+    redirect('/auth/signin');
+  }
+
   // 초기 게시물 로드 (최신순, 10개)
   const posts = await prisma.post.findMany({
     take: 10,
@@ -26,6 +36,14 @@ export default async function Home() {
           image: true,
         },
       },
+      likes: {
+        where: {
+          userId: currentUser.id,
+        },
+        select: {
+          userId: true,
+        },
+      },
       _count: {
         select: {
           likes: true,
@@ -34,6 +52,13 @@ export default async function Home() {
       },
     },
   });
+
+  // 게시물에 liked 속성 추가
+  const postsWithLiked = posts.map((post) => ({
+    ...post,
+    liked: post.likes.length > 0,
+    likes: undefined, // likes 배열은 제거
+  }));
 
   // 다음 커서 계산
   const nextCursor = posts.length === 10 ? posts[posts.length - 1].id : null;
@@ -47,7 +72,7 @@ export default async function Home() {
         </p>
       </div>
 
-      <Feed initialPosts={posts} initialCursor={nextCursor} />
+      <Feed initialPosts={postsWithLiked} initialCursor={nextCursor} isAuthenticated={true} />
     </main>
   );
 }

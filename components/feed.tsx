@@ -9,6 +9,7 @@ interface Post {
   image: string;
   caption: string | null;
   createdAt: Date;
+  liked: boolean;
   user: {
     id: string;
     username: string;
@@ -24,9 +25,10 @@ interface Post {
 interface FeedProps {
   initialPosts: Post[];
   initialCursor: string | null;
+  isAuthenticated: boolean;
 }
 
-export function Feed({ initialPosts, initialCursor }: FeedProps) {
+export function Feed({ initialPosts, initialCursor, isAuthenticated }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [loading, setLoading] = useState(false);
@@ -69,7 +71,7 @@ export function Feed({ initialPosts, initialCursor }: FeedProps) {
     <div className="w-full">
       <div className="space-y-6">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} isAuthenticated={isAuthenticated} />
         ))}
       </div>
 
