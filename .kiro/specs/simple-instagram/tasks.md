@@ -152,7 +152,7 @@
   - **Property 22: Own profile shows edit options**
   - **Validates: Requirements 6.4**
 
-- [ ] 11. 게시물 업로드 페이지 구현
+- [x] 11. 게시물 업로드 페이지 구현
   - 게시물 업로드 페이지 컴포넌트
   - 이미지 선택 및 미리보기
   - 캡션 입력 폼

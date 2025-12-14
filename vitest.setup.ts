@@ -4,6 +4,8 @@ import { resetDatabase, prisma } from './__tests__/utils/test-db'
 
 // Global setup - run once before all tests
 beforeAll(async () => {
+  // Enable foreign key constraints for SQLite
+  await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON')
   // Ensure database is clean before starting tests
   await resetDatabase()
 })

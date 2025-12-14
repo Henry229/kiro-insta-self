@@ -12,6 +12,10 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
+    // Load test environment variables
+    env: {
+      DATABASE_URL: 'file:./test.db',
+    },
     // Run tests sequentially to avoid database conflicts
     pool: 'forks',
     poolOptions: {
