@@ -8,45 +8,39 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db';
 
 describe('Authentication System', () => {
-  const testUser = {
-    email: 'auth-test@example.com',
-    username: 'authtestuser',
-    password: 'testpassword123',
-    name: 'Auth Test User',
+  let testUser: {
+    email: string;
+    username: string;
+    password: string;
+    name: string;
   };
 
   beforeAll(async () => {
     // Clean up test data
-    await prisma.user.deleteMany({
-      where: {
-        OR: [{ email: testUser.email }, { username: testUser.username }],
-      },
-    });
+    await cleanupDatabase();
+    
+    // Create unique test user data
+    testUser = {
+      email: createTestEmail('auth-test'),
+      username: createTestUsername('authtestuser'),
+      password: 'testpassword123',
+      name: 'Auth Test User',
+    };
   });
 
   afterAll(async () => {
     // Clean up test data
-    await prisma.user.deleteMany({
-      where: {
-        OR: [{ email: testUser.email }, { username: testUser.username }],
-      },
-    });
+    await cleanupDatabase();
     await prisma.$disconnect();
   });
 
   beforeEach(async () => {
     // Ensure clean state before each test
-    await prisma.user.deleteMany({
-      where: {
-        OR: [{ email: testUser.email }, { username: testUser.username }],
-      },
-    });
+    await cleanupDatabase();
   });
 
   describe('Property 2: Valid login succeeds (Requirement 1.2)', () => {

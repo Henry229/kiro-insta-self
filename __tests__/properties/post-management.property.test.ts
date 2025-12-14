@@ -18,30 +18,19 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
 import * as fc from 'fast-check';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db';
 
 describe('Property-Based Tests: Post Management', () => {
-  let testCounter = 0;
-
   beforeEach(async () => {
-    testCounter++;
-    // Clean up database in correct order (child to parent)
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    // Clean up database before each test
+    await cleanupDatabase();
   });
 
   afterEach(async () => {
-    // Clean up database in correct order (child to parent)
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    // Clean up database after each test
+    await cleanupDatabase();
   });
 
   describe('Property 6: Post creation adds to feed', () => {
@@ -58,8 +47,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `testuser_${testCounter}@example.com`,
-          username: `testuser_${testCounter}`,
+          email: createTestEmail('testuser'),
+          username: createTestUsername('testuser'),
           password: hashedPassword,
           name: 'Test User',
         },
@@ -138,8 +127,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `edgeuser_${testCounter}@example.com`,
-          username: `edgeuser_${testCounter}`,
+          email: createTestEmail('edgeuser'),
+          username: createTestUsername('edgeuser'),
           password: hashedPassword,
           name: 'Edge User',
         },
@@ -198,8 +187,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `redirectuser_${testCounter}@example.com`,
-          username: `redirectuser_${testCounter}`,
+          email: createTestEmail('redirectuser'),
+          username: createTestUsername('redirectuser'),
           password: hashedPassword,
           name: 'Redirect User',
         },
@@ -249,8 +238,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `chronouser_${testCounter}@example.com`,
-          username: `chronouser_${testCounter}`,
+          email: createTestEmail('chronouser'),
+          username: createTestUsername('chronouser'),
           password: hashedPassword,
           name: 'Chrono User',
         },
@@ -318,8 +307,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `displayuser_${testCounter}@example.com`,
-          username: `displayuser_${testCounter}`,
+          email: createTestEmail('displayuser'),
+          username: createTestUsername('displayuser'),
           password: hashedPassword,
           name: 'Display User',
         },
@@ -392,8 +381,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `topuser_${testCounter}@example.com`,
-          username: `topuser_${testCounter}`,
+          email: createTestEmail('topuser'),
+          username: createTestUsername('topuser'),
           password: hashedPassword,
           name: 'Top User',
         },
@@ -477,8 +466,8 @@ describe('Property-Based Tests: Post Management', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user = await prisma.user.create({
         data: {
-          email: `multiuser_${testCounter}@example.com`,
-          username: `multiuser_${testCounter}`,
+          email: createTestEmail('multiuser'),
+          username: createTestUsername('multiuser'),
           password: hashedPassword,
           name: 'Multi User',
         },

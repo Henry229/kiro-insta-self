@@ -106,26 +106,26 @@
   - **Property 14: Post displays accurate like information**
   - **Validates: Requirements 4.3**
 
-- [ ] 9. 댓글 시스템 구현
+- [x] 9. 댓글 시스템 구현
   - 댓글 CRUD API Routes 구현
   - 댓글 목록 컴포넌트
   - 댓글 작성 폼 컴포넌트
   - 댓글 검증 및 정렬
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ]* 9.1 댓글 생성 속성 테스트 작성
+- [x] 9.1 댓글 생성 속성 테스트 작성
   - **Property 15: Comment creation adds to post**
   - **Validates: Requirements 5.1**
 
-- [ ]* 9.2 댓글 정보 표시 속성 테스트 작성
+- [x] 9.2 댓글 정보 표시 속성 테스트 작성
   - **Property 16: Comment display includes required information**
   - **Validates: Requirements 5.2**
 
-- [ ]* 9.3 빈 댓글 거부 속성 테스트 작성
+- [x] 9.3 빈 댓글 거부 속성 테스트 작성
   - **Property 17: Empty comments rejected**
   - **Validates: Requirements 5.3**
 
-- [ ]* 9.4 댓글 정렬 속성 테스트 작성
+- [x] 9.4 댓글 정렬 속성 테스트 작성
   - **Property 18: Comments displayed in chronological order**
   - **Validates: Requirements 5.4**
 

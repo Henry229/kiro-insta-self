@@ -1,34 +1,23 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
-
-const prisma = new PrismaClient()
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db'
 
 describe('Task 2.1 - Database Model: Valid user registration creates account', () => {
-  let testCounter = 0
-
   beforeEach(async () => {
-    testCounter++
     // Clean up database before each test
-    await prisma.comment.deleteMany()
-    await prisma.like.deleteMany()
-    await prisma.post.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupDatabase()
   })
 
   afterEach(async () => {
     // Clean up database after each test
-    await prisma.comment.deleteMany()
-    await prisma.like.deleteMany()
-    await prisma.post.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupDatabase()
   })
 
   it('should create a new user account with valid email and password', async () => {
     // Arrange
     const validUserData = {
-      email: 'test@example.com',
-      username: 'testuser',
+      email: createTestEmail('test'),
+      username: createTestUsername('testuser'),
       password: await bcrypt.hash('password123', 10),
       name: 'Test User',
     }
@@ -73,10 +62,10 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
 
   it('should enforce unique email constraint', async () => {
     // Arrange
-    const uniqueEmail = `duplicate_${testCounter}@example.com`
+    const uniqueEmail = createTestEmail('duplicate')
     const userData = {
       email: uniqueEmail,
-      username: `user1_${testCounter}`,
+      username: createTestUsername('user1'),
       password: await bcrypt.hash('password123', 10),
     }
 
@@ -87,18 +76,18 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
       prisma.user.create({
         data: {
           email: uniqueEmail, // Same email, different username
-          username: `user2_${testCounter}`,
+          username: createTestUsername('user2'),
           password: await bcrypt.hash('password456', 10),
         },
       })
-    ).rejects.toThrow()
+    ).rejects.toThrow(/unique constraint/i)
   })
 
   it('should enforce unique username constraint', async () => {
     // Arrange
-    const uniqueUsername = `duplicateuser_${testCounter}`
+    const uniqueUsername = createTestUsername('duplicateuser')
     const userData = {
-      email: `user1_${testCounter}@example.com`,
+      email: createTestEmail('user1'),
       username: uniqueUsername,
       password: await bcrypt.hash('password123', 10),
     }
@@ -109,12 +98,12 @@ describe('Task 2.1 - Database Model: Valid user registration creates account', (
     await expect(
       prisma.user.create({
         data: {
-          email: `user2_${testCounter}@example.com`,
+          email: createTestEmail('user2'),
           username: uniqueUsername, // Same username, different email
           password: await bcrypt.hash('password456', 10),
         },
       })
-    ).rejects.toThrow()
+    ).rejects.toThrow(/unique constraint/i)
   })
 
   it('should retrieve created user by email', async () => {

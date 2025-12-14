@@ -11,6 +11,16 @@ export async function GET(
     const session = await auth();
     const { id } = await params;
 
+    // 현재 로그인한 사용자 조회
+    let currentUserId: string | undefined;
+    if (session?.user?.email) {
+      const currentUser = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true },
+      });
+      currentUserId = currentUser?.id;
+    }
+
     const post = await prisma.post.findUnique({
       where: { id },
       include: {
@@ -37,13 +47,10 @@ export async function GET(
             createdAt: 'asc',
           },
         },
-        likes: session?.user?.email
+        likes: currentUserId
           ? {
-              where: {
-                user: {
-                  email: session.user.email,
-                },
-              },
+              where: { userId: currentUserId },
+              select: { userId: true },
             }
           : false,
         _count: {
@@ -62,7 +69,14 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ post });
+    // liked 속성 추가 및 likes 배열 제거
+    const postWithLiked = {
+      ...post,
+      liked: currentUserId && Array.isArray(post.likes) ? post.likes.length > 0 : false,
+      likes: undefined,
+    };
+
+    return NextResponse.json(postWithLiked);
   } catch (error) {
     console.error('게시물 조회 오류:', error);
     return NextResponse.json(

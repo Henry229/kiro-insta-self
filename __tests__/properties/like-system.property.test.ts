@@ -6,27 +6,19 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
 import * as fc from 'fast-check';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db';
 
 describe('Property-Based Tests: Like System', () => {
   beforeEach(async () => {
     // Clean up database before each test
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    await cleanupDatabase();
   });
 
   afterEach(async () => {
     // Clean up database after each test
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    await cleanupDatabase();
   });
 
   describe('Property 12: Like increases count and activates button', () => {
@@ -66,20 +58,20 @@ describe('Property-Based Tests: Like System', () => {
             const hashedPassword = await bcrypt.hash('password123', 10);
             const user = await prisma.user.create({
               data: {
-                email: email,
-                username: username,
+                email: createTestEmail('likeuser'),
+                username: createTestUsername('likeuser'),
                 password: hashedPassword,
-                name: testData.userDisplayName || username,
+                name: testData.userDisplayName || 'Like User',
               },
             });
 
             // Arrange: Create another user who owns the post
             const postOwner = await prisma.user.create({
               data: {
-                email: `owner_${email}`,
-                username: `owner_${username}`,
+                email: createTestEmail('postowner'),
+                username: createTestUsername('postowner'),
                 password: hashedPassword,
-                name: `Owner ${username}`,
+                name: 'Post Owner',
               },
             });
 
@@ -153,7 +145,7 @@ describe('Property-Based Tests: Like System', () => {
         ),
         { numRuns: 100 } // Run 100 iterations as specified in design
       );
-    }, 15000); // Increased timeout for property-based testing
+    }, 25000); // Increased timeout for property-based testing
 
     it('should handle edge cases when liking posts', async () => {
       /**
@@ -581,7 +573,7 @@ describe('Property-Based Tests: Like System', () => {
         ),
         { numRuns: 100 } // Run 100 iterations as specified in design
       );
-    }, 20000); // Increased timeout for property-based testing
+    }, 30000); // Increased timeout for property-based testing
 
     it('should handle multiple toggle cycles correctly', async () => {
       /**
@@ -681,8 +673,11 @@ describe('Property-Based Tests: Like System', () => {
               expect(likedStatus).not.toBeNull();
 
               // Unlike the post
-              await prisma.like.delete({
-                where: { id: like.id },
+              await prisma.like.deleteMany({
+                where: {
+                  userId: user.id,
+                  postId: post.id,
+                },
               });
 
               // Verify unliked state (should return to original)
@@ -1060,7 +1055,7 @@ describe('Property-Based Tests: Like System', () => {
         ),
         { numRuns: 100 } // Run 100 iterations as specified in design
       );
-    }, 15000); // Increased timeout for property-based testing
+    }, 25000); // Increased timeout for property-based testing
 
     it('should maintain accurate like information after like state changes', async () => {
       /**

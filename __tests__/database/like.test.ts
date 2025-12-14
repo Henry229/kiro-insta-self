@@ -1,44 +1,40 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
-
-const prisma = new PrismaClient()
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db'
 
 describe('Task 8 - Like System: Property-Based Tests', () => {
-  let testCounter = 0
   let testUser1: { id: string; email: string; username: string }
   let testUser2: { id: string; email: string; username: string }
   let testPost: { id: string; image: string; userId: string }
 
   beforeEach(async () => {
-    testCounter++
-
     // Clean up database before each test
-    await prisma.comment.deleteMany()
-    await prisma.like.deleteMany()
-    await prisma.post.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupDatabase()
 
-    // Create test users
-    testUser1 = await prisma.user.create({
-      data: {
-        email: `user1_${testCounter}@example.com`,
-        username: `user1_${testCounter}`,
-        password: await bcrypt.hash('password123', 10),
-        name: 'Test User 1',
-      },
-    })
+    // Create test users with transaction to ensure consistency
+    const users = await prisma.$transaction([
+      prisma.user.create({
+        data: {
+          email: createTestEmail('user1'),
+          username: createTestUsername('user1'),
+          password: await bcrypt.hash('password123', 10),
+          name: 'Test User 1',
+        },
+      }),
+      prisma.user.create({
+        data: {
+          email: createTestEmail('user2'),
+          username: createTestUsername('user2'),
+          password: await bcrypt.hash('password123', 10),
+          name: 'Test User 2',
+        },
+      }),
+    ])
 
-    testUser2 = await prisma.user.create({
-      data: {
-        email: `user2_${testCounter}@example.com`,
-        username: `user2_${testCounter}`,
-        password: await bcrypt.hash('password123', 10),
-        name: 'Test User 2',
-      },
-    })
+    testUser1 = users[0]
+    testUser2 = users[1]
 
-    // Create test post
+    // Create test post after users are confirmed to exist
     testPost = await prisma.post.create({
       data: {
         image: '/uploads/test-image.jpg',
@@ -50,10 +46,7 @@ describe('Task 8 - Like System: Property-Based Tests', () => {
 
   afterEach(async () => {
     // Clean up database after each test
-    await prisma.comment.deleteMany()
-    await prisma.like.deleteMany()
-    await prisma.post.deleteMany()
-    await prisma.user.deleteMany()
+    await cleanupDatabase()
   })
 
   describe('Property 12: Like increases count and activates button (Requirements 4.1)', () => {

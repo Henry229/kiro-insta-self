@@ -6,27 +6,19 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
 import * as fc from 'fast-check';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db';
 
 describe('Property-Based Tests: User Registration', () => {
   beforeEach(async () => {
     // Clean up database before each test
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    await cleanupDatabase();
   });
 
   afterEach(async () => {
     // Clean up database after each test
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    await cleanupDatabase();
   });
 
   describe('Property 1: Valid user registration creates account', () => {
@@ -50,13 +42,10 @@ describe('Property-Based Tests: User Registration', () => {
           }),
           async (userData) => {
             testCounter++;
-            // Generate completely unique identifiers using timestamp and counter
-            const uniqueId = `${testStartTime}_${testCounter}`;
-            const email = `test_${uniqueId}@example.com`;
-            const username = `user_${uniqueId}`;
-            
             // Arrange: Hash the password as the API would do
             const hashedPassword = await bcrypt.hash(userData.password, 10);
+            const email = createTestEmail('test');
+            const username = createTestUsername('user');
             
             // Act: Create user account (simulating the registration API logic)
             const createdUser = await prisma.user.create({
@@ -64,7 +53,7 @@ describe('Property-Based Tests: User Registration', () => {
                 email: email,
                 username: username,
                 password: hashedPassword,
-                name: userData.name || username,
+                name: userData.name || 'Test User',
               },
             });
 
@@ -125,12 +114,10 @@ describe('Property-Based Tests: User Registration', () => {
           }),
           async (userData) => {
             testCounter++;
-            // Generate unique identifiers
-            const uniqueId = `edge_${testStartTime}_${testCounter}`;
-            const email = `${uniqueId}@test.com`;
-            const username = `${uniqueId}`;
-
             const hashedPassword = await bcrypt.hash(userData.password, 10);
+            
+            const email = createTestEmail('edge');
+            const username = createTestUsername('edge');
             
             const createdUser = await prisma.user.create({
               data: {

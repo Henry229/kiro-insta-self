@@ -1,28 +1,20 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-
-const prisma = new PrismaClient();
+import { prisma, cleanupDatabase, createTestEmail, createTestUsername } from '../utils/test-db';
 
 describe('Post Management API', () => {
   let testUser: { id: string; email: string; username: string };
-  let testCounter = 0;
 
   beforeEach(async () => {
-    testCounter++;
-
     // Clean up database in correct order (child to parent)
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    await cleanupDatabase();
 
     // Create test user with unique identifiers
     const hashedPassword = await bcrypt.hash('password123', 10);
     testUser = await prisma.user.create({
       data: {
-        email: `testuser_${testCounter}@example.com`,
-        username: `testuser_${testCounter}`,
+        email: createTestEmail('testuser'),
+        username: createTestUsername('testuser'),
         password: hashedPassword,
         name: 'Test User',
       },
@@ -30,11 +22,8 @@ describe('Post Management API', () => {
   });
 
   afterEach(async () => {
-    // Clean up database in correct order (child to parent)
-    await prisma.comment.deleteMany();
-    await prisma.like.deleteMany();
-    await prisma.post.deleteMany();
-    await prisma.user.deleteMany();
+    // Clean up database after each test
+    await cleanupDatabase();
   });
 
   describe('Post Creation', () => {
@@ -209,8 +198,8 @@ describe('Post Management API', () => {
       const hashedPassword = await bcrypt.hash('password123', 10);
       const user2 = await prisma.user.create({
         data: {
-          email: `user2_${testCounter}@example.com`,
-          username: `user2_${testCounter}`,
+          email: createTestEmail('user2'),
+          username: createTestUsername('user2'),
           password: hashedPassword,
           name: 'User 2',
         },
