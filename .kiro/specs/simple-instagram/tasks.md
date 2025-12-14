@@ -129,26 +129,26 @@
   - **Property 18: Comments displayed in chronological order**
   - **Validates: Requirements 5.4**
 
-- [ ] 10. 프로필 페이지 구현
+- [x] 10. 프로필 페이지 구현
   - 사용자 프로필 페이지 컴포넌트
   - 프로필 정보 표시 (사용자명, 게시물 수, 프로필 사진)
   - 사용자 게시물 그리드 뷰
   - 게시물 상세 보기 모달
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ]* 10.1 프로필 정보 표시 속성 테스트 작성
+- [x]* 10.1 프로필 정보 표시 속성 테스트 작성
   - **Property 19: Profile displays user information**
   - **Validates: Requirements 6.1**
 
-- [ ]* 10.2 프로필 게시물 그리드 속성 테스트 작성
+- [x]* 10.2 프로필 게시물 그리드 속성 테스트 작성
   - **Property 20: Profile displays user posts in grid**
   - **Validates: Requirements 6.2**
 
-- [ ]* 10.3 게시물 상세 보기 속성 테스트 작성
+- [x]* 10.3 게시물 상세 보기 속성 테스트 작성
   - **Property 21: Profile post click shows detail view**
   - **Validates: Requirements 6.3**
 
-- [ ]* 10.4 자신의 프로필 편집 옵션 속성 테스트 작성
+- [x]* 10.4 자신의 프로필 편집 옵션 속성 테스트 작성
   - **Property 22: Own profile shows edit options**
   - **Validates: Requirements 6.4**
 
