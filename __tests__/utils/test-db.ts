@@ -18,36 +18,44 @@ const prisma = new PrismaClient({
  */
 export async function cleanupDatabase(): Promise<void> {
   try {
-    // Ensure foreign keys are enabled first
+    // Ensure foreign keys are enabled for proper cleanup
     await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
 
-    // Disable foreign key checks temporarily for cleanup
-    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = OFF');
-
-    // Delete in any order since FK checks are off
-    await prisma.$transaction([
-      prisma.comment.deleteMany(),
-      prisma.like.deleteMany(),
-      prisma.post.deleteMany(),
-      prisma.user.deleteMany(),
-    ]);
-
-    // Re-enable foreign key checks
-    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+    // Delete in correct order to respect foreign key constraints
+    // Child tables first, then parent tables
+    await prisma.comment.deleteMany();
+    await prisma.like.deleteMany();
+    await prisma.post.deleteMany();
+    await prisma.user.deleteMany();
   } catch (error) {
     console.error('Database cleanup failed:', error);
-    // Re-enable FK even on error
-    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON').catch(() => {});
     throw error;
   }
 }
 
 /**
  * Reset the database to a clean state
- * This simply calls cleanupDatabase without double-checking
+ * Ensures a completely clean slate by disabling and re-enabling foreign keys
  */
 export async function resetDatabase(): Promise<void> {
-  await cleanupDatabase();
+  try {
+    // Temporarily disable foreign keys for aggressive cleanup
+    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = OFF');
+
+    // Delete all data
+    await prisma.comment.deleteMany();
+    await prisma.like.deleteMany();
+    await prisma.post.deleteMany();
+    await prisma.user.deleteMany();
+
+    // Re-enable foreign keys
+    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+  } catch (error) {
+    console.error('Database reset failed:', error);
+    // Ensure foreign keys are back on even if cleanup fails
+    await prisma.$executeRawUnsafe('PRAGMA foreign_keys = ON');
+    throw error;
+  }
 }
 
 /**

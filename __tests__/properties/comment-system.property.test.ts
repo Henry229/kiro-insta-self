@@ -32,25 +32,6 @@ describe('Property-Based Tests: Comment System', () => {
        * to the post's comment list and make it retrievable
        */
 
-      // Create test user and post
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('commentuser'),
-          username: createTestUsername('commentuser'),
-          password: hashedPassword,
-          name: 'Comment User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/test_post.jpg',
-          caption: 'Test post for comments',
-          userId: user.id,
-        },
-      });
-
       // Generate valid comment content (non-empty, trimmed strings)
       const validCommentContent = fc
         .string({ minLength: 1, maxLength: 500 })
@@ -58,6 +39,25 @@ describe('Property-Based Tests: Comment System', () => {
 
       await fc.assert(
         fc.asyncProperty(validCommentContent, async (content) => {
+          // Create test user and post for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('commentuser'),
+              username: createTestUsername('commentuser'),
+              password: hashedPassword,
+              name: 'Comment User',
+            },
+          });
+
+          const post = await prisma.post.create({
+            data: {
+              image: '/uploads/test_post.jpg',
+              caption: 'Test post for comments',
+              userId: user.id,
+            },
+          });
+
           const trimmedContent = content.trim();
 
           // Get initial comment count
@@ -137,9 +137,6 @@ describe('Property-Based Tests: Comment System', () => {
           expect(retrievedComment).toBeDefined();
           expect(retrievedComment?.content).toBe(trimmedContent);
           expect(retrievedComment?.postId).toBe(post.id);
-
-          // Cleanup this specific comment
-          await prisma.comment.delete({ where: { id: createdComment.id } });
         }),
         { numRuns: 100 }
       );
@@ -153,24 +150,6 @@ describe('Property-Based Tests: Comment System', () => {
        * Property: Edge cases like very long comments, special characters,
        * and unicode should still result in valid comment creation
        */
-
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('edgecommentuser'),
-          username: createTestUsername('edgecommentuser'),
-          password: hashedPassword,
-          name: 'Edge Comment User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/edge_test_post.jpg',
-          caption: 'Edge test post',
-          userId: user.id,
-        },
-      });
 
       await fc.assert(
         fc.asyncProperty(
@@ -189,6 +168,25 @@ describe('Property-Based Tests: Comment System', () => {
             fc.constant('Score: 9/10 ⭐⭐⭐⭐⭐')
           ),
           async (content) => {
+            // Create test user and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('edgecommentuser'),
+                username: createTestUsername('edgecommentuser'),
+                password: hashedPassword,
+                name: 'Edge Comment User',
+              },
+            });
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/edge_test_post.jpg',
+                caption: 'Edge test post',
+                userId: user.id,
+              },
+            });
+
             const initialCount = await prisma.comment.count({
               where: { postId: post.id },
             });
@@ -216,9 +214,6 @@ describe('Property-Based Tests: Comment System', () => {
               where: { id: comment.id },
             });
             expect(retrievedComment?.content).toBe(content);
-
-            // Cleanup
-            await prisma.comment.delete({ where: { id: comment.id } });
           }
         ),
         { numRuns: 20 }
@@ -234,24 +229,6 @@ describe('Property-Based Tests: Comment System', () => {
        * retrievable and properly associated with the post
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('multicommentuser'),
-          username: createTestUsername('multicommentuser'),
-          password: hashedPassword,
-          name: 'Multi Comment User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/multi_comment_post.jpg',
-          caption: 'Post for multiple comments',
-          userId: user.id,
-        },
-      });
-
       const commentCount = fc.integer({ min: 2, max: 8 });
       const validComment = fc
         .string({ minLength: 1, maxLength: 100 })
@@ -264,6 +241,25 @@ describe('Property-Based Tests: Comment System', () => {
             comments: fc.array(validComment, { minLength: 2, maxLength: 8 }),
           }),
           async ({ count, comments }) => {
+            // Create test user and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('multicommentuser'),
+                username: createTestUsername('multicommentuser'),
+                password: hashedPassword,
+                name: 'Multi Comment User',
+              },
+            });
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/multi_comment_post.jpg',
+                caption: 'Post for multiple comments',
+                userId: user.id,
+              },
+            });
+
             const createdComments: Comment[] = [];
             const commentsToCreate = comments.slice(0, count);
 
@@ -305,11 +301,6 @@ describe('Property-Based Tests: Comment System', () => {
               expect(foundComment).toBeDefined();
               expect(foundComment?.content).toBe(createdComments[i].content);
             }
-
-            // Cleanup
-            await prisma.comment.deleteMany({
-              where: { id: { in: createdComments.map((c) => c.id) } },
-            });
           }
         ),
         { numRuns: 15 }
@@ -326,25 +317,6 @@ describe('Property-Based Tests: Comment System', () => {
        * Property: For any displayed comment, it should include author name, content, and timestamp
        */
 
-      // Create test user and post
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('displayuser'),
-          username: createTestUsername('displayuser'),
-          password: hashedPassword,
-          name: 'Display User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/display_test_post.jpg',
-          caption: 'Test post for comment display',
-          userId: user.id,
-        },
-      });
-
       // Generate valid comment content
       const validCommentContent = fc
         .string({ minLength: 1, maxLength: 500 })
@@ -352,6 +324,25 @@ describe('Property-Based Tests: Comment System', () => {
 
       await fc.assert(
         fc.asyncProperty(validCommentContent, async (content) => {
+          // Create test user and post for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('displayuser'),
+              username: createTestUsername('displayuser'),
+              password: hashedPassword,
+              name: 'Display User',
+            },
+          });
+
+          const post = await prisma.post.create({
+            data: {
+              image: '/uploads/display_test_post.jpg',
+              caption: 'Test post for comment display',
+              userId: user.id,
+            },
+          });
+
           const trimmedContent = content.trim();
 
           // Act: Create comment
@@ -380,7 +371,7 @@ describe('Property-Based Tests: Comment System', () => {
 
           // Assert: Comment display should include all required information
           expect(displayedComment).toBeDefined();
-          
+
           // Assert: Author name should be included
           expect(displayedComment?.user).toBeDefined();
           expect(displayedComment?.user.username).toBeDefined();
@@ -395,15 +386,12 @@ describe('Property-Based Tests: Comment System', () => {
           // Assert: Timestamp should be included
           expect(displayedComment?.createdAt).toBeDefined();
           expect(displayedComment?.createdAt).toBeInstanceOf(Date);
-          
+
           // Assert: Timestamp should be recent (within last minute)
           const now = new Date();
           const commentTime = displayedComment!.createdAt;
           const timeDiff = now.getTime() - commentTime.getTime();
           expect(timeDiff).toBeLessThan(60000); // Less than 1 minute
-
-          // Cleanup
-          await prisma.comment.delete({ where: { id: createdComment.id } });
         }),
         { numRuns: 100 }
       );
@@ -490,11 +478,6 @@ describe('Property-Based Tests: Comment System', () => {
             expect(displayedComment?.user.username).toBeDefined();
             expect(displayedComment?.content).toBe(content);
             expect(displayedComment?.createdAt).toBeInstanceOf(Date);
-
-            // Cleanup
-            await prisma.comment.delete({ where: { id: comment.id } });
-            await prisma.post.delete({ where: { id: post.id } });
-            await prisma.user.delete({ where: { id: user.id } });
           }
         ),
         { numRuns: 50 }
@@ -510,30 +493,6 @@ describe('Property-Based Tests: Comment System', () => {
        * include all required information
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const users: User[] = [];
-      
-      // Create multiple users
-      for (let i = 0; i < 3; i++) {
-        const user = await prisma.user.create({
-          data: {
-            email: createTestEmail(`multiuser_${i}`),
-            username: createTestUsername(`multiuser_${i}`),
-            password: hashedPassword,
-            name: `Multi User ${i}`,
-          },
-        });
-        users.push(user);
-      }
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/multi_display_post.jpg',
-          caption: 'Post for multiple comment display',
-          userId: users[0].id,
-        },
-      });
-
       const commentCount = fc.integer({ min: 2, max: 5 });
       const validComment = fc
         .string({ minLength: 1, maxLength: 100 })
@@ -546,6 +505,31 @@ describe('Property-Based Tests: Comment System', () => {
             comments: fc.array(validComment, { minLength: 2, maxLength: 5 }),
           }),
           async ({ count, comments }) => {
+            // Create test users and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const users: User[] = [];
+
+            // Create multiple users
+            for (let i = 0; i < 3; i++) {
+              const user = await prisma.user.create({
+                data: {
+                  email: createTestEmail(`multiuser_${i}`),
+                  username: createTestUsername(`multiuser_${i}`),
+                  password: hashedPassword,
+                  name: `Multi User ${i}`,
+                },
+              });
+              users.push(user);
+            }
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/multi_display_post.jpg',
+                caption: 'Post for multiple comment display',
+                userId: users[0].id,
+              },
+            });
+
             const createdComments: Comment[] = [];
             const commentsToCreate = comments.slice(0, count);
 
@@ -586,36 +570,25 @@ describe('Property-Based Tests: Comment System', () => {
               expect(comment.user).toBeDefined();
               expect(comment.user.username).toBeDefined();
               expect(comment.user.name).toBeDefined();
-              
+
               // Content should be present
               expect(comment.content).toBeDefined();
               expect(comment.content.trim().length).toBeGreaterThan(0);
-              
+
               // Timestamp should be present and valid
               expect(comment.createdAt).toBeDefined();
               expect(comment.createdAt).toBeInstanceOf(Date);
-              
+
               // Verify the comment belongs to the correct user
               const expectedUser = users.find(u => u.id === comment.userId);
               expect(expectedUser).toBeDefined();
               expect(comment.user.username).toBe(expectedUser?.username);
               expect(comment.user.name).toBe(expectedUser?.name);
             });
-
-            // Cleanup
-            await prisma.comment.deleteMany({
-              where: { id: { in: createdComments.map((c) => c.id) } },
-            });
           }
         ),
         { numRuns: 20 }
       );
-
-      // Cleanup users and post
-      await prisma.post.delete({ where: { id: post.id } });
-      for (const user of users) {
-        await prisma.user.delete({ where: { id: user.id } });
-      }
     }, 30000);
   });
 
@@ -628,25 +601,6 @@ describe('Property-Based Tests: Comment System', () => {
        * Property: For any empty or whitespace-only comment, submission should be rejected
        * and input state maintained
        */
-
-      // Create test user and post
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('emptycommentuser'),
-          username: createTestUsername('emptycommentuser'),
-          password: hashedPassword,
-          name: 'Empty Comment User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/empty_comment_test_post.jpg',
-          caption: 'Test post for empty comment rejection',
-          userId: user.id,
-        },
-      });
 
       // Generate empty and whitespace-only strings
       const emptyOrWhitespaceContent = fc.oneof(
@@ -664,6 +618,25 @@ describe('Property-Based Tests: Comment System', () => {
 
       await fc.assert(
         fc.asyncProperty(emptyOrWhitespaceContent, async (content) => {
+          // Create test user and post for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('emptycommentuser'),
+              username: createTestUsername('emptycommentuser'),
+              password: hashedPassword,
+              name: 'Empty Comment User',
+            },
+          });
+
+          const post = await prisma.post.create({
+            data: {
+              image: '/uploads/empty_comment_test_post.jpg',
+              caption: 'Test post for empty comment rejection',
+              userId: user.id,
+            },
+          });
+
           // Get initial comment count
           const initialComments = await prisma.comment.findMany({
             where: { postId: post.id },
@@ -698,7 +671,7 @@ describe('Property-Based Tests: Comment System', () => {
             const finalComments = await prisma.comment.findMany({
               where: { postId: post.id },
             });
-            
+
             // Comment count should remain unchanged
             expect(finalComments).toHaveLength(initialCount);
           }
@@ -710,10 +683,6 @@ describe('Property-Based Tests: Comment System', () => {
         }),
         { numRuns: 100 }
       );
-
-      // Cleanup
-      await prisma.post.delete({ where: { id: post.id } });
-      await prisma.user.delete({ where: { id: user.id } });
     }, 30000);
 
     it('should maintain input state when empty comment is rejected', async () => {
@@ -777,10 +746,6 @@ describe('Property-Based Tests: Comment System', () => {
         // In a real UI, this would mean the input field keeps its value
         expect(emptyInput).toBe(emptyInput); // Input is preserved as-is
       }
-
-      // Cleanup
-      await prisma.post.delete({ where: { id: post.id } });
-      await prisma.user.delete({ where: { id: user.id } });
     }, 15000);
 
     it('should accept valid non-empty comments after rejecting empty ones', async () => {
@@ -791,24 +756,6 @@ describe('Property-Based Tests: Comment System', () => {
        * Property: After rejecting empty comments, valid non-empty comments should still be accepted
        * (ensures the rejection doesn't break the normal flow)
        */
-
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('validafteremptyuser'),
-          username: createTestUsername('validafteremptyuser'),
-          password: hashedPassword,
-          name: 'Valid After Empty User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/valid_after_empty_test_post.jpg',
-          caption: 'Test post for valid comments after empty rejection',
-          userId: user.id,
-        },
-      });
 
       const emptyContent = fc.oneof(
         fc.constant(''),
@@ -827,6 +774,25 @@ describe('Property-Based Tests: Comment System', () => {
             valid: validContent,
           }),
           async ({ empty, valid }) => {
+            // Create test user and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('validafteremptyuser'),
+                username: createTestUsername('validafteremptyuser'),
+                password: hashedPassword,
+                name: 'Valid After Empty User',
+              },
+            });
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/valid_after_empty_test_post.jpg',
+                caption: 'Test post for valid comments after empty rejection',
+                userId: user.id,
+              },
+            });
+
             const initialCount = await prisma.comment.count({
               where: { postId: post.id },
             });
@@ -856,17 +822,10 @@ describe('Property-Based Tests: Comment System', () => {
               where: { postId: post.id },
             });
             expect(finalCount).toBe(initialCount + 1);
-
-            // Cleanup
-            await prisma.comment.delete({ where: { id: comment.id } });
           }
         ),
         { numRuns: 50 }
       );
-
-      // Cleanup
-      await prisma.post.delete({ where: { id: post.id } });
-      await prisma.user.delete({ where: { id: user.id } });
     }, 25000);
   });
 
@@ -878,25 +837,6 @@ describe('Property-Based Tests: Comment System', () => {
        *
        * Property: For any set of comments on a post, they should be displayed ordered by creation time
        */
-
-      // Create test user and post
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('chronouser'),
-          username: createTestUsername('chronouser'),
-          password: hashedPassword,
-          name: 'Chrono User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/chrono_test_post.jpg',
-          caption: 'Test post for chronological ordering',
-          userId: user.id,
-        },
-      });
 
       // Generate a set of comments (2-8 comments)
       const commentCount = fc.integer({ min: 2, max: 8 });
@@ -911,6 +851,25 @@ describe('Property-Based Tests: Comment System', () => {
             comments: fc.array(validComment, { minLength: 2, maxLength: 8 }),
           }),
           async ({ count, comments }) => {
+            // Create test user and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('chronouser'),
+                username: createTestUsername('chronouser'),
+                password: hashedPassword,
+                name: 'Chrono User',
+              },
+            });
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/chrono_test_post.jpg',
+                caption: 'Test post for chronological ordering',
+                userId: user.id,
+              },
+            });
+
             const createdComments: Comment[] = [];
             const commentsToCreate = comments.slice(0, count);
 
@@ -954,7 +913,7 @@ describe('Property-Based Tests: Comment System', () => {
             for (let i = 0; i < displayedComments.length - 1; i++) {
               const currentComment = displayedComments[i];
               const nextComment = displayedComments[i + 1];
-              
+
               expect(currentComment.createdAt.getTime()).toBeLessThanOrEqual(
                 nextComment.createdAt.getTime()
               );
@@ -970,19 +929,10 @@ describe('Property-Based Tests: Comment System', () => {
             const timestamps = displayedComments.map(c => c.createdAt.getTime());
             const sortedTimestamps = [...timestamps].sort((a, b) => a - b);
             expect(timestamps).toEqual(sortedTimestamps);
-
-            // Cleanup
-            await prisma.comment.deleteMany({
-              where: { id: { in: createdComments.map((c) => c.id) } },
-            });
           }
         ),
         { numRuns: 100 }
       );
-
-      // Cleanup
-      await prisma.post.delete({ where: { id: post.id } });
-      await prisma.user.delete({ where: { id: user.id } });
     }, 30000);
 
     it('should maintain chronological order with comments from different users', async () => {
@@ -992,30 +942,6 @@ describe('Property-Based Tests: Comment System', () => {
        *
        * Property: Comments from different users should still be displayed in chronological order
        */
-
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const users: User[] = [];
-      
-      // Create multiple users
-      for (let i = 0; i < 3; i++) {
-        const user = await prisma.user.create({
-          data: {
-            email: createTestEmail(`chronouser_${i}`),
-            username: createTestUsername(`chronouser_${i}`),
-            password: hashedPassword,
-            name: `Chrono User ${i}`,
-          },
-        });
-        users.push(user);
-      }
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/multi_user_chrono_post.jpg',
-          caption: 'Post for multi-user chronological ordering',
-          userId: users[0].id,
-        },
-      });
 
       const commentCount = fc.integer({ min: 3, max: 9 });
       const validComment = fc
@@ -1029,6 +955,31 @@ describe('Property-Based Tests: Comment System', () => {
             comments: fc.array(validComment, { minLength: 3, maxLength: 9 }),
           }),
           async ({ count, comments }) => {
+            // Create test users and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const users: User[] = [];
+
+            // Create multiple users
+            for (let i = 0; i < 3; i++) {
+              const user = await prisma.user.create({
+                data: {
+                  email: createTestEmail(`chronouser_${i}`),
+                  username: createTestUsername(`chronouser_${i}`),
+                  password: hashedPassword,
+                  name: `Chrono User ${i}`,
+                },
+              });
+              users.push(user);
+            }
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/multi_user_chrono_post.jpg',
+                caption: 'Post for multi-user chronological ordering',
+                userId: users[0].id,
+              },
+            });
+
             const createdComments: Comment[] = [];
             const commentsToCreate = comments.slice(0, count);
 
@@ -1088,21 +1039,10 @@ describe('Property-Based Tests: Comment System', () => {
               expect(expectedUser).toBeDefined();
               expect(displayedComments[i].user.username).toBe(expectedUser?.username);
             }
-
-            // Cleanup
-            await prisma.comment.deleteMany({
-              where: { id: { in: createdComments.map((c) => c.id) } },
-            });
           }
         ),
         { numRuns: 50 }
       );
-
-      // Cleanup users and post
-      await prisma.post.delete({ where: { id: post.id } });
-      for (const user of users) {
-        await prisma.user.delete({ where: { id: user.id } });
-      }
     }, 35000);
 
     it('should handle edge cases in chronological ordering', async () => {
@@ -1113,24 +1053,6 @@ describe('Property-Based Tests: Comment System', () => {
        * Property: Edge cases like rapid comment creation should still maintain chronological order
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('edgechronouser'),
-          username: createTestUsername('edgechronouser'),
-          password: hashedPassword,
-          name: 'Edge Chrono User',
-        },
-      });
-
-      const post = await prisma.post.create({
-        data: {
-          image: '/uploads/edge_chrono_post.jpg',
-          caption: 'Post for edge case chronological ordering',
-          userId: user.id,
-        },
-      });
-
       await fc.assert(
         fc.asyncProperty(
           fc.array(
@@ -1138,6 +1060,25 @@ describe('Property-Based Tests: Comment System', () => {
             { minLength: 2, maxLength: 5 }
           ),
           async (comments) => {
+            // Create test user and post for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('edgechronouser'),
+                username: createTestUsername('edgechronouser'),
+                password: hashedPassword,
+                name: 'Edge Chrono User',
+              },
+            });
+
+            const post = await prisma.post.create({
+              data: {
+                image: '/uploads/edge_chrono_post.jpg',
+                caption: 'Post for edge case chronological ordering',
+                userId: user.id,
+              },
+            });
+
             const createdComments: Comment[] = [];
 
             // Create comments rapidly (minimal delay)
@@ -1177,19 +1118,10 @@ describe('Property-Based Tests: Comment System', () => {
             for (let i = 0; i < createdComments.length; i++) {
               expect(displayedComments[i].content).toBe(createdComments[i].content);
             }
-
-            // Cleanup
-            await prisma.comment.deleteMany({
-              where: { id: { in: createdComments.map((c) => c.id) } },
-            });
           }
         ),
         { numRuns: 30 }
       );
-
-      // Cleanup
-      await prisma.post.delete({ where: { id: post.id } });
-      await prisma.user.delete({ where: { id: user.id } });
     }, 25000);
   });
 });

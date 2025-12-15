@@ -43,17 +43,6 @@ describe('Property-Based Tests: Post Management', () => {
        * should result in the post being added to the feed and retrievable
        */
 
-      // Create a test user first
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('testuser'),
-          username: createTestUsername('testuser'),
-          password: hashedPassword,
-          name: 'Test User',
-        },
-      });
-
       const validImageUrl = fc
         .string({ minLength: 1, maxLength: 200 })
         .map((s) => `/uploads/${s.replace(/[^a-zA-Z0-9.-]/g, '_')}.jpg`);
@@ -70,6 +59,17 @@ describe('Property-Based Tests: Post Management', () => {
             caption: validCaption,
           }),
           async ({ image, caption }) => {
+            // Create a new user for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('testuser'),
+                username: createTestUsername('testuser'),
+                password: hashedPassword,
+                name: 'Test User',
+              },
+            });
+
             // Act: Create post
             const createdPost = await prisma.post.create({
               data: {
@@ -106,9 +106,6 @@ describe('Property-Based Tests: Post Management', () => {
             expect(foundPost).toBeDefined();
             expect(foundPost?.image).toBe(image);
             expect(foundPost?.caption).toBe(caption);
-
-            // Cleanup this specific post
-            await prisma.post.delete({ where: { id: createdPost.id } });
           }
         ),
         { numRuns: 15 }
@@ -164,9 +161,6 @@ describe('Property-Based Tests: Post Management', () => {
               where: { id: post.id },
             });
             expect(posts).toHaveLength(1);
-
-            // Cleanup
-            await prisma.post.delete({ where: { id: post.id } });
           }
         ),
         { numRuns: 5 }
@@ -184,22 +178,23 @@ describe('Property-Based Tests: Post Management', () => {
        * status (which would trigger redirect in the UI)
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('redirectuser'),
-          username: createTestUsername('redirectuser'),
-          password: hashedPassword,
-          name: 'Redirect User',
-        },
-      });
-
       const validImageUrl = fc
         .string({ minLength: 5, maxLength: 100 })
         .map((s) => `/uploads/${s.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`);
 
       await fc.assert(
         fc.asyncProperty(validImageUrl, async (image) => {
+          // Create a new user for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('redirectuser'),
+              username: createTestUsername('redirectuser'),
+              password: hashedPassword,
+              name: 'Redirect User',
+            },
+          });
+
           const post = await prisma.post.create({
             data: {
               image,
@@ -216,9 +211,6 @@ describe('Property-Based Tests: Post Management', () => {
           // which would trigger redirect to feed page
           const statusCode = post.id ? 201 : 500;
           expect(statusCode).toBe(201);
-
-          // Cleanup
-          await prisma.post.delete({ where: { id: post.id } });
         }),
         { numRuns: 10 }
       );
@@ -235,20 +227,21 @@ describe('Property-Based Tests: Post Management', () => {
        * display posts in reverse chronological order (newest first)
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('chronouser'),
-          username: createTestUsername('chronouser'),
-          password: hashedPassword,
-          name: 'Chrono User',
-        },
-      });
-
       const postCount = fc.integer({ min: 2, max: 10 });
 
       await fc.assert(
         fc.asyncProperty(postCount, async (count) => {
+          // Create a new user for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('chronouser'),
+              username: createTestUsername('chronouser'),
+              password: hashedPassword,
+              name: 'Chrono User',
+            },
+          });
+
           const createdPosts = [];
 
           // Create posts with slight delays to ensure different timestamps
@@ -283,11 +276,6 @@ describe('Property-Based Tests: Post Management', () => {
 
           // The most recent post should be first
           expect(feedPosts[0].id).toBe(createdPosts[createdPosts.length - 1].id);
-
-          // Cleanup
-          await prisma.post.deleteMany({
-            where: { id: { in: createdPosts.map((p) => p.id) } },
-          });
         }),
         { numRuns: 8 }
       );
@@ -303,16 +291,6 @@ describe('Property-Based Tests: Post Management', () => {
        * Property: For any post retrieved from the feed, it should include
        * image, author name, description, and post time
        */
-
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('displayuser'),
-          username: createTestUsername('displayuser'),
-          password: hashedPassword,
-          name: 'Display User',
-        },
-      });
 
       const validImageUrl = fc
         .string({ minLength: 5, maxLength: 100 })
@@ -330,6 +308,17 @@ describe('Property-Based Tests: Post Management', () => {
             caption: validCaption,
           }),
           async ({ image, caption }) => {
+            // Create a new user for each property test run
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const user = await prisma.user.create({
+              data: {
+                email: createTestEmail('displayuser'),
+                username: createTestUsername('displayuser'),
+                password: hashedPassword,
+                name: 'Display User',
+              },
+            });
+
             // Create post
             const post = await prisma.post.create({
               data: {
@@ -358,9 +347,6 @@ describe('Property-Based Tests: Post Management', () => {
             // Assert: User information is included
             expect(post.user.username).toBe(user.username);
             expect(post.user.name).toBe(user.name);
-
-            // Cleanup
-            await prisma.post.delete({ where: { id: post.id } });
           }
         ),
         { numRuns: 12 }
@@ -378,20 +364,21 @@ describe('Property-Based Tests: Post Management', () => {
        * should result in that post appearing at position 0 in the feed
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('topuser'),
-          username: createTestUsername('topuser'),
-          password: hashedPassword,
-          name: 'Top User',
-        },
-      });
-
       const initialPostCount = fc.integer({ min: 1, max: 8 });
 
       await fc.assert(
         fc.asyncProperty(initialPostCount, async (count) => {
+          // Create a new user for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('topuser'),
+              username: createTestUsername('topuser'),
+              password: hashedPassword,
+              name: 'Top User',
+            },
+          });
+
           // Create initial posts
           const existingPosts = [];
           for (let i = 0; i < count; i++) {
@@ -442,13 +429,6 @@ describe('Property-Based Tests: Post Management', () => {
           expect(feedAfter[0].createdAt.getTime()).toBeGreaterThan(
             feedBefore[0].createdAt.getTime()
           );
-
-          // Cleanup
-          await prisma.post.deleteMany({
-            where: {
-              id: { in: [...existingPosts.map((p) => p.id), newPost.id] },
-            },
-          });
         }),
         { numRuns: 8 }
       );
@@ -463,20 +443,21 @@ describe('Property-Based Tests: Post Management', () => {
        * should appear at the top, maintaining chronological order
        */
 
-      const hashedPassword = await bcrypt.hash('password123', 10);
-      const user = await prisma.user.create({
-        data: {
-          email: createTestEmail('multiuser'),
-          username: createTestUsername('multiuser'),
-          password: hashedPassword,
-          name: 'Multi User',
-        },
-      });
-
       const newPostCount = fc.integer({ min: 2, max: 5 });
 
       await fc.assert(
         fc.asyncProperty(newPostCount, async (count) => {
+          // Create a new user for each property test run
+          const hashedPassword = await bcrypt.hash('password123', 10);
+          const user = await prisma.user.create({
+            data: {
+              email: createTestEmail('multiuser'),
+              username: createTestUsername('multiuser'),
+              password: hashedPassword,
+              name: 'Multi User',
+            },
+          });
+
           const createdPosts = [];
 
           // Create posts sequentially
@@ -512,11 +493,6 @@ describe('Property-Based Tests: Post Management', () => {
           expect(finalFeed[0].id).toBe(
             createdPosts[createdPosts.length - 1].id
           );
-
-          // Cleanup
-          await prisma.post.deleteMany({
-            where: { id: { in: createdPosts.map((p) => p.id) } },
-          });
         }),
         { numRuns: 6 }
       );
